@@ -1,23 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
+
 
 public class ClickAndDestroy : MonoBehaviour
 {
     
+    Ray ray;
+    RaycastHit hit;
+    
     // Update is called once per frame
     void Update()
     {
-        if(input.(GetMouseButtonDown(0)))
-        
-        {RaycastHit hit;
-        Ray ray = Camera.Main.ScreenPointToRay (Input.mousePosition)};
+        if(Input.GetMouseButtonDown(0))
+        {
+            ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        }
 
-        if (Physic.Raycast(ray, out hit))
-        (
+        if (Physics.Raycast(ray, out hit))
+        {
             MeshCollider bc = hit.collider as MeshCollider;
-            if (mc != null)
-            destroy(mc.gameObejct);
-        )
+            if (bc != null) Destroy(bc.gameObject);
+        }
     }
 }
