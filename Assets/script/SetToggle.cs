@@ -12,8 +12,9 @@ public class SetToggle : MonoBehaviour
     
     void Update()
     {
-        if(flower.activeSelf==false){
-           toggle.GetComponent<Toggle>().isOn = true;
+        if(flower.activeSelf==false)
+        {
+        toggle.GetComponent<Toggle>().isOn = true;
         }
     }
 }
