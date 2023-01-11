@@ -2,39 +2,58 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Character : MonoBehaviour
+public class MyCharacter : MonoBehaviour
 {
+    //a variable to hold the current destination of the character
     Vector3 _Destination;
     private UnityEngine.AI.NavMeshPath _path;
     List<Vector3> _simplePath = new List<Vector3>();
-    public CapsuleCollider _Collider;
-
+    public BoxCollider _Collider;
     // Start is called before the first frame update
     void Start()
     {
+        //when we start, set the destination to whatever the current position is
         _Destination = transform.position;
         _path = new UnityEngine.AI.NavMeshPath();
     }
-
+    //a function to set the target desitnation of the character
     public void SetTarget(Vector3 TargetPos)
     {
         _Destination = TargetPos;
         //find a path to the destination from our current position
         bool foundPath = UnityEngine.AI.NavMesh.CalculatePath(transform.position, TargetPos, UnityEngine.AI.NavMesh.AllAreas, _path);
         _simplePath.Clear();
+
         for (int i = 0; i < _path.corners.Length; i++)
         {
+            Debug.Log("I: " + i + "num corners: "+_path.corners.Length);
             _simplePath.Add(_path.corners[i]);
         }
-    }
 
+        Debug.Log("set target");
+    }
     // Update is called once per frame
     void Update()
     {
         //when updating, work out the direction we need to move in
 
         Vector3 MoveDirection = Vector3.zero;
-        //remove any parts of our path that we are really close to
+        if (_simplePath.Count > 0)
+        {
+            //remove any parts of our path that we are really close to
+            Vector3 Relpos = (transform.position - _simplePath[0]);
+            Relpos.y = 0;
+            //remove any parts of our path that we are really close to
+            while (_simplePath.Count > 0 && Relpos.magnitude < 0.5f)
+            {
+
+                _simplePath.RemoveAt(0);
+                if (_simplePath.Count > 0)
+                {
+                    Relpos = (transform.position - _simplePath[0]);
+                }
+            }
+        }
         while (_simplePath.Count > 0 && (transform.position - _simplePath[0]).magnitude < 0.5f)
         {
             _simplePath.RemoveAt(0);
@@ -45,7 +64,6 @@ public class Character : MonoBehaviour
             MoveDirection = _simplePath[0] - transform.position;
         }
 
-        //if the destination is a reasonable distance away, update the characters rotation to point in this direction
         if (MoveDirection.magnitude > 0.5f)
         {
             MoveDirection.Normalize();
@@ -67,6 +85,7 @@ public class Character : MonoBehaviour
         }
         //move the character down a bit (sort of simple gravity)
         transform.position = transform.position + new Vector3(0.0f, -0.01f, 0.0f);
+
         //character controller collsion (dont use physics directly, only collision tests)
         //we do this because we only want character to depenatrate vertically when colliding with the floor
         //this type of collision is usually called a "character controller" 
@@ -79,7 +98,7 @@ public class Character : MonoBehaviour
                 Vector3 hitDirection;
                 float hitDistance;
                 if (Physics.ComputePenetration(coliders[i], coliders[i].transform.position, coliders[i].transform.rotation, _Collider,
-               _Collider.transform.position, _Collider.transform.rotation, out hitDirection, out hitDistance))
+     _Collider.transform.position, _Collider.transform.rotation, out hitDirection, out hitDistance))
                 {
                     //make the hit direction relative to the character
                     hitDirection *= -1.0f;
